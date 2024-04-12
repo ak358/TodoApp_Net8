@@ -11,7 +11,6 @@ using System.Diagnostics;
 
 namespace TodoApp_Net8.Controllers
 {
-    [AllowAnonymous]
     public class LoginController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -21,11 +20,14 @@ namespace TodoApp_Net8.Controllers
             _context = context;
         }
 
+        [AllowAnonymous]
+
         public IActionResult Login()
         {
             return View();
         }
 
+        //[???]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login([Bind("UserName,Password")] LoginViewModel loginViewModel)
@@ -61,6 +63,8 @@ namespace TodoApp_Net8.Controllers
             return RedirectToAction("AccessDenied");
         }
 
+        [Authorize]
+
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(
@@ -68,6 +72,7 @@ namespace TodoApp_Net8.Controllers
             return RedirectToAction("Login");
         }
 
+        [AllowAnonymous]
         public IActionResult AccessDenied()
         {
             return View();
