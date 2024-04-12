@@ -54,7 +54,7 @@ namespace TodoApp_Net8.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Summary,Detail,Limit,Done")] Todo todo)
+        public async Task<IActionResult> Create([Bind("Id,Summary,Detail,Limit")] Todo todo)
         {
             if (ModelState.IsValid)
             {
