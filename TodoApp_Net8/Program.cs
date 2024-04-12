@@ -37,7 +37,7 @@ namespace TodoApp_Net8
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                pattern: "{controller=Todoes}/{action=Index}/{id?}");
 
             app.Run();
         }
