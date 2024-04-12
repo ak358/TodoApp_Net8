@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace TodoApp_Net8.Models
 {
     public class Todo
@@ -8,10 +10,10 @@ namespace TodoApp_Net8.Models
         public DateTime Limit { get; set; }
         public bool Done { get; set; }
 
+        public int UserId { get; set; }
 
-
-
-
+        [ForeignKey("UserId")]
+        public User User { get; set; }
 
     }
 }

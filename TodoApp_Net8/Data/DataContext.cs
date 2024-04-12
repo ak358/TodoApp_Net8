@@ -11,8 +11,8 @@ namespace TodoApp_Net8.Data
 
         }
         public DbSet<Todo> Todoes { get; set; }
-
-
+        public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
 
 
     }
