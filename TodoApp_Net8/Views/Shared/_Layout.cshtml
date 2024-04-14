@@ -34,7 +34,7 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Create">Register</a>
                             </li>
                         }
-                        @if (User.Identity.IsAuthenticated && User.IsInRole("admin"))
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("administrator"))
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Users</a>

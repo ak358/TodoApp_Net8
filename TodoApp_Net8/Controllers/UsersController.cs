@@ -22,7 +22,7 @@ namespace TodoApp_Net8.Controllers
         }
 
         // GET: Users
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "administrator")]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Users.Include(u => u.Role);
@@ -30,7 +30,7 @@ namespace TodoApp_Net8.Controllers
         }
 
         // GET: Users/Details/5
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "administrator")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -85,7 +85,7 @@ namespace TodoApp_Net8.Controllers
                     await _context.SaveChangesAsync();
                     TempData["SuccessMessage"] = "ユーザーを新規登録しました。";
 
-                    if (User.IsInRole("admin"))
+                    if (User.IsInRole("administrator"))
                     { 
                         return RedirectToAction("Index");
                     }
@@ -100,7 +100,7 @@ namespace TodoApp_Net8.Controllers
         }
 
         // GET: Users/Edit/5
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "administrator")]
 
         public async Task<IActionResult> Edit(int? id)
         {
@@ -133,7 +133,7 @@ namespace TodoApp_Net8.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "administrator")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,UserName,Password,RoleName")] UserViewModel UserViewModel)
         {
             if (id != UserViewModel.Id)
@@ -181,7 +181,7 @@ namespace TodoApp_Net8.Controllers
         }
 
         // GET: Users/Delete/5
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "administrator")]
 
         public async Task<IActionResult> Delete(int? id)
         {
@@ -204,7 +204,7 @@ namespace TodoApp_Net8.Controllers
         // POST: Users/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "administrator")]
 
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

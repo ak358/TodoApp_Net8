@@ -11,7 +11,7 @@ using TodoApp_Net8.Models;
 
 namespace TodoApp_Net8.Controllers
 {
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "administrator")]
     public class RolesController : Controller
     {
         private readonly ApplicationDbContext _context;

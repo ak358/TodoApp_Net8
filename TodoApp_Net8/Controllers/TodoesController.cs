@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +25,16 @@ namespace TodoApp_Net8.Controllers
         // GET: Todoes
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Todoes.ToListAsync());
+            var userId = await _context.Users
+                   .Where(u => u.UserName == User.Identity.Name)
+                   .Select(u => u.Id)
+                   .FirstOrDefaultAsync();
+
+            var userTodos = await _context.Todoes
+                .Where(t => t.UserId == userId)
+                .ToListAsync();
+
+            return View(userTodos);
         }
 
         // GET: Todoes/Details/5
@@ -56,10 +66,21 @@ namespace TodoApp_Net8.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Summary,Detail,Limit")] Todo todo)
+        public async Task<IActionResult> Create([Bind("Summary,Detail,Limit")] Todo todo)
         {
             if (ModelState.IsValid)
             {
+                var userId = await _context.Users
+                       .Where(u => u.UserName == User.Identity.Name)
+                       .Select(u => u.Id)
+                       .FirstOrDefaultAsync();
+
+                todo.User = await _context.Users
+                       .Where(u => u.Id == userId)
+                       .FirstOrDefaultAsync();
+
+                todo.Done = false;
+
                 _context.Add(todo);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -99,6 +120,15 @@ namespace TodoApp_Net8.Controllers
             {
                 try
                 {
+                    var userId = await _context.Users
+                   .Where(u => u.UserName == User.Identity.Name)
+                   .Select(u => u.Id)
+                   .FirstOrDefaultAsync();
+
+                    todo.User = await _context.Users
+                           .Where(u => u.Id == userId)
+                           .FirstOrDefaultAsync();
+
                     _context.Update(todo);
                     await _context.SaveChangesAsync();
                 }

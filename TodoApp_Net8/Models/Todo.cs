@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TodoApp_Net8.Models
@@ -13,6 +14,7 @@ namespace TodoApp_Net8.Models
         public int UserId { get; set; }
 
         [ForeignKey("UserId")]
+        [ValidateNever]
         public User User { get; set; }
 
     }
