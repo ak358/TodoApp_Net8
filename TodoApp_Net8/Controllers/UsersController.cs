@@ -31,7 +31,6 @@ namespace TodoApp_Net8.Controllers
 
         // GET: Users/Details/5
         [Authorize(Roles = "admin")]
-
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -85,8 +84,16 @@ namespace TodoApp_Net8.Controllers
 
                     _context.Add(user);
                     await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "登録しました。ログインしてください。";
-                    return RedirectToAction("Login", "Login");
+                    TempData["SuccessMessage"] = "ユーザーを新規登録しました。";
+
+                    if (User.IsInRole("admin"))
+                    { 
+                        return RedirectToAction("Index");
+                    }
+                    else
+                    {
+                        return RedirectToAction("Login", "Login");
+                    }
                 }
             }
             ViewData["RoleName"] = new SelectList(_context.Roles, "RoleName", "RoleName");
@@ -104,12 +111,22 @@ namespace TodoApp_Net8.Controllers
             }
 
             var user = await _context.Users.FindAsync(id);
+
             if (user == null)
             {
                 return NotFound();
             }
-            ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "RoleName", user.RoleId);
-            return View(user);
+
+            UserViewModel userViewModel = new()
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Password = user.Password,
+                RoleName = _context.Roles.FirstOrDefault(r => user.RoleId == r.Id).RoleName
+            };
+
+            ViewData["RoleName"] = new SelectList(_context.Roles, "RoleName", "RoleName", userViewModel.RoleName);
+            return View(userViewModel);
         }
 
         // POST: Users/Edit/5
@@ -118,10 +135,9 @@ namespace TodoApp_Net8.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "admin")]
-
-        public async Task<IActionResult> Edit(int id, [Bind("Id,UserName,Password,RoleId")] User user)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,UserName,Password,RoleName")] UserViewModel UserViewModel)
         {
-            if (id != user.Id)
+            if (id != UserViewModel.Id)
             {
                 return NotFound();
             }
@@ -130,12 +146,27 @@ namespace TodoApp_Net8.Controllers
             {
                 try
                 {
+                    User user = await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => id == u.Id);
+
+                    if(user == null)
+                    {
+                        return NotFound();
+                    }
+
+                    user.UserName = UserViewModel.UserName;
+                    user.Password = UserViewModel.Password;
+                    user.RoleId = _context.Roles.FirstOrDefault(r => UserViewModel.RoleName == r.RoleName).Id;
+                    Role role = await _context.Roles.FirstOrDefaultAsync(r => r.Id == user.RoleId);
+                    user.Role = role;
+
                     _context.Update(user);
                     await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "更新しました。";
+                    return RedirectToAction("Index");
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!UserExists(user.Id))
+                    if (!UserExists(UserViewModel.Id))
                     {
                         return NotFound();
                     }
@@ -146,8 +177,8 @@ namespace TodoApp_Net8.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "RoleName", user.RoleId);
-            return View(user);
+            ViewData["RoleName"] = new SelectList(_context.Roles, "RoleName", "RoleName", UserViewModel.RoleName);
+            return View(UserViewModel);
         }
 
         // GET: Users/Delete/5
