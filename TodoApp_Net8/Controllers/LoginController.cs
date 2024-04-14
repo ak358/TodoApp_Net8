@@ -27,7 +27,7 @@ namespace TodoApp_Net8.Controllers
             return View();
         }
 
-        //[???]
+        [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login([Bind("UserName,Password")] LoginViewModel loginViewModel)

@@ -12,7 +12,6 @@ using TodoApp_Net8.Models;
 namespace TodoApp_Net8.Controllers
 {
     [Authorize(Roles = "admin")]
-
     public class RolesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -57,7 +56,7 @@ namespace TodoApp_Net8.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,RoleName")] Role role)
+        public async Task<IActionResult> Create([Bind("RoleName")] Role role)
         {
             if (ModelState.IsValid)
             {

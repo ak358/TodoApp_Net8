@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -10,6 +11,7 @@ namespace TodoApp_Net8.Models
         [Required]
         public string RoleName { get; set; }
 
+        [ValidateNever]
         public ICollection<User> Users { get; set; }
 
     }
