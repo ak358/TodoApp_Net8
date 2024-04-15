@@ -1,15 +1,23 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using System.Configuration;
 using System.Reflection.Metadata;
 using TodoApp_Net8.Models;
+using TodoApp_Net8.Models.ViewModels;
+using TodoApp_Net8.Utility;
 
 namespace TodoApp_Net8.Data
 {
     public class ApplicationDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        private readonly IConfiguration _configuration;
+        private readonly string _salt;
+
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IConfiguration configuration)
             : base(options)
         {
+            _configuration = configuration;
+            _salt = _configuration.GetValue<string>("salt");
 
         }
         public DbSet<Todo> Todoes { get; set; }
@@ -44,14 +52,14 @@ namespace TodoApp_Net8.Data
                {
                    Id = 1,
                    UserName = "admin",
-                   Password = "password",
+                   Password = Helper.GeneratePasswordHash("admin", _salt),
                    RoleId = 1
                },
                new User
                {
                    Id = 2,
                    UserName = "user",
-                   Password = "password",
+                   Password = Helper.GeneratePasswordHash("user", _salt),
                    RoleId = 2
                }
            );

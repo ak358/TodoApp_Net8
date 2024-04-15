@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,16 +12,22 @@ using Microsoft.EntityFrameworkCore;
 using TodoApp_Net8.Data;
 using TodoApp_Net8.Models;
 using TodoApp_Net8.Models.ViewModels;
+using TodoApp_Net8.Utility;
 
 namespace TodoApp_Net8.Controllers
 {
     public class UsersController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public UsersController(ApplicationDbContext context)
+        private readonly IConfiguration _configuration;
+        private readonly string _salt;
+        public UsersController(ApplicationDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
+            // ソルトを取得
+            _salt = _configuration.GetValue<string>("salt");
+
         }
 
         // GET: Users
@@ -73,17 +82,18 @@ namespace TodoApp_Net8.Controllers
                 
                 if(role != null)
                 {
+
                     User user = new User
                     {
                         UserName = UserViewModel.UserName,
-                        Password = UserViewModel.Password,
+                        Password = Helper.GeneratePasswordHash(UserViewModel.Password, _salt),
                         Role = role,
                         RoleId = role.Id
                     };
 
                     _context.Add(user);
                     await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "ユーザーを新規登録しました。";
+                    //TempData["SuccessMessage"] = "ユーザーを新規登録しました。";
 
                     if (User.IsInRole("administrator"))
                     { 
@@ -153,7 +163,7 @@ namespace TodoApp_Net8.Controllers
                     }
 
                     user.UserName = UserViewModel.UserName;
-                    user.Password = UserViewModel.Password;
+                    user.Password = Helper.GeneratePasswordHash(UserViewModel.Password, _salt);
                     user.RoleId = _context.Roles.FirstOrDefault(r => UserViewModel.RoleName == r.RoleName).Id;
                     Role role = await _context.Roles.FirstOrDefaultAsync(r => r.Id == user.RoleId);
                     user.Role = role;
@@ -222,5 +232,11 @@ namespace TodoApp_Net8.Controllers
         {
             return _context.Users.Any(e => e.Id == id);
         }
+
+
     }
+
+
+
+
 }
