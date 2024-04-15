@@ -76,6 +76,12 @@ namespace TodoApp_Net8.Controllers
         {
             if (ModelState.IsValid)
             {
+                var databaseUser = _context.Users.Where(u => u.UserName == UserViewModel.UserName).FirstOrDefaultAsync();
+                if(databaseUser != null)
+                {
+                    return View(UserViewModel);
+                }
+
                 Role role = new();
                 role = await _context.Roles.Include(r => r.Users).
                     FirstOrDefaultAsync(r => r.RoleName == UserViewModel.RoleName);
